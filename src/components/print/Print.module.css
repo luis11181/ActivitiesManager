@@ -1,0 +1,52 @@
+@media all {
+  /* .pageContainer {
+    display: none;
+  } */
+}
+
+/* hides the material to print for the page viewer */
+@media screen {
+  .pageContainer {
+    display: none;
+  }
+}
+
+@media print {
+  html,
+  body {
+    height: initial !important;
+    overflow: initial !important;
+    background-color: white !important;
+    -webkit-print-color-adjust: exact;
+    font-size: 40%; /* 62.5% of 16px = 10px */
+    margin: 1%;
+  }
+
+  div {
+    page-break-inside: avoid;
+  }
+
+  .pageContainer {
+    display: block;
+  }
+
+  .item {
+    page-break-after: avoid;
+  }
+
+  .noBreakInside {
+    /** apply this class to every component that shouldn't be cut off between to pages of your PDF/HTML */
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /** .break-before {
+   
+    break-before: "always";
+  } */
+}
+
+@page {
+  size: auto;
+  /* margin: 15mm 10mm; */
+}
