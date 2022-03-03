@@ -21,6 +21,7 @@ export default function AuthPage() {
   const handleSignForm = () => {
     setIsSignIn(!isSignIn);
   };
+
   return (
     <Box
       sx={{

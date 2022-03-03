@@ -1,12 +1,7 @@
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+
 import { SubmitHandler, useForm } from "react-hook-form";
-import { auth } from "../../firebase";
 import { Button, FormControl, InputLabel, Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
@@ -18,6 +13,18 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
+
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+
+import {
+  changeAuthState,
+  changeJWTFechaExpiracion,
+  changeJwtToken,
+  changeRol,
+  changeUserId,
+} from "../../app/mainStateSlice";
+
+import { changeNombreUsuario } from "../../app/mainStateSlice";
 
 interface IFormInput {
   //firstName: string;
@@ -34,14 +41,13 @@ interface IFromProps {
   from: string;
 }
 
-//to auth woth ggog;e
-const provider = new GoogleAuthProvider();
-
 const AuthForm: React.FC<IFromProps> = (props): JSX.Element => {
   // let location: any = useLocation();
   // //si hubo una ruta anterio la pone en la variable, en caso contrario lleva a la pronmcipal
   // let from = location.state?.from?.pathname || "/";
   let navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
 
   const [values, setValues] = useState<IValues>({
     showPassword: false,
@@ -62,58 +68,70 @@ const AuthForm: React.FC<IFromProps> = (props): JSX.Element => {
     });
   };
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     //alert(JSON.stringify(data));
 
-    // console.log(data);
-    signInWithEmailAndPassword(auth, data.email, data.password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        console.log(user);
+    interface IResponse {
+      token: string;
+      userId: string;
+      role: string;
+      firstName: string;
+      message: string;
+    }
 
-        //si todo salio bien navega a la pagina de donde venia sin estar autorizado, o a la pagina princeipal
-        navigate(props.from, { replace: true });
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setValues({
-          ...values,
-          error: errorMessage,
-        });
-        // console.log(errorCode, errorMessage);
+    try {
+      let resultFetch = await fetch(
+        `${process.env.REACT_APP_BACKENDURL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        }
+      );
+
+      let resultFetchJson = (await resultFetch.json()) as IResponse;
+
+      if (resultFetch.status === 401) {
+        throw new Error(resultFetchJson.message);
+      }
+
+      if (!resultFetch.ok) {
+        throw new Error(resultFetchJson.message);
+        // throw new Error("fallo el inicio de sesion!");
+      }
+
+      const remainingMilliseconds = 60 * 60 * 1000;
+
+      const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
+
+      dispatch(changeAuthState(true));
+      dispatch(changeJwtToken(resultFetchJson.token));
+      dispatch(changeJWTFechaExpiracion(expiryDate.toISOString()));
+      dispatch(changeUserId(resultFetchJson.userId));
+      dispatch(changeNombreUsuario(resultFetchJson.firstName));
+      dispatch(changeRol(resultFetchJson.role));
+
+      localStorage.setItem("JWTToken", resultFetchJson.token);
+      localStorage.setItem("userId", resultFetchJson.userId);
+      localStorage.setItem("rol", resultFetchJson.role);
+      localStorage.setItem("nombreUsuario", resultFetchJson.firstName);
+
+      localStorage.setItem("JWTFechaExpiracion", expiryDate.toISOString());
+
+      navigate(props.from, { replace: true });
+    } catch (err: any) {
+      const errorMessage = err.message;
+      console.log(err);
+      setValues({
+        ...values,
+        error: errorMessage,
       });
-  };
-
-  const googleRegister = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-
-        const token = credential!.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        console.log(user);
-        //si todo salio bien navega a la pagina de donde venia sin estar autorizado, o a la pagina princeipal
-        navigate(props.from, { replace: true });
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setValues({
-          ...values,
-          error: errorMessage,
-        });
-
-        // The email of the user's account used.
-        const email = error.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        console.log(errorCode, errorMessage, email, credential);
-      });
+    }
   };
 
   return (
@@ -211,9 +229,6 @@ const AuthForm: React.FC<IFromProps> = (props): JSX.Element => {
           Sign In
         </Button>
       </Box>
-      <Box sx={{ m: 1 }} />
-
-      <Button onClick={googleRegister}> SignIn with Google</Button>
       <Box sx={{ m: 1 }} />
 
       <Typography variant="body1" sx={{ color: "red" }}>

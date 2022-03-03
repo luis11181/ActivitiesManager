@@ -12,16 +12,17 @@ import AuthPage from "./pages/AuthPage";
 import MainPage from "./pages/MainPage";
 import NotFound from "./pages/NotFound";
 import useCheckAuth from "./hooks/useCheckAuth";
-import { useLayoutEffect } from "react";
 
 function App() {
   //Hook para checar el estado de autenticacion y subscribirse a sus cambios
-  // useLayoutEffect(() => {
-  //   useCheckAuth();
-  //   //console.log("corrio la funcion de CheckAuth en el use effect");
-  // }, []);
-
   useCheckAuth();
+
+  // fetch('http://localhost:8080/feed/posts?page=' + page, {
+  //     headers: {
+  //       Authorization: 'Bearer ' + this.props.token
+  //     }
+  //   })
+
   return (
     <Layout>
       {

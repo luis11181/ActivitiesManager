@@ -1,13 +1,6 @@
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import {
-  signInWithPopup,
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { auth } from "../../firebase";
 import { Button, FormControl, InputLabel, Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
@@ -18,8 +11,12 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import { useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 interface IFormInput {
-  name: string;
+  firstName: string;
+  lastName: string;
+  role: string;
   email: string;
   password: string;
 }
@@ -29,31 +26,9 @@ interface IValues {
   error: null | string;
 }
 
-//to auth woth ggog;e
-const provider = new GoogleAuthProvider();
-const googleRegister = () => {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential!.accessToken;
-      // The signed-in user info.
-      const user = result.user;
-      console.log(user);
-    })
-    .catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      console.log(errorCode, errorMessage, email, credential);
-    });
-};
-
 const AuthForm = () => {
+  let navigate = useNavigate();
+
   const [values, setValues] = useState<IValues>({
     showPassword: false,
     error: null,
@@ -73,37 +48,51 @@ const AuthForm = () => {
     });
   };
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     // alert(JSON.stringify(data));
 
-   // console.log(data);
+    // console.log(data);
 
-    createUserWithEmailAndPassword(auth, data.email, data.password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        updateProfile(user, {
-          displayName: data.name,
-          //photoURL: `https://gravatar.com/avatar${md5(user.email)}?d=identicon`,
-        }).then(function () {
-          console.log(`Profile updated.`);
+    try {
+      let resultFetch = await fetch(
+        `${process.env.REACT_APP_BACKENDURL}/auth/signup`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            role: data.role,
+          }),
+        }
+      );
 
-          console.log(user);
-        });
-        //    sendEmailVerification(auth.currentUser).then(() => {
-        // Email verification sent!
-        // ...
-        //});
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-        setValues({
-          ...values,
-          error: errorMessage,
-        });
+      let resultFetchJson = await resultFetch.json();
+
+      if (resultFetch.status === 422) {
+        throw new Error(resultFetchJson.message || "Error al crear el usuario");
+      }
+
+      if (!resultFetch.ok) {
+        throw new Error(resultFetchJson.message);
+        // throw new Error("fallo el inicio de sesion!");
+      }
+
+      console.log(resultFetchJson);
+
+      navigate("/");
+    } catch (err: any) {
+      const errorMessage = err.message;
+      console.log(err);
+      setValues({
+        ...values,
+        error: errorMessage,
       });
+    }
   };
 
   return (
@@ -143,16 +132,45 @@ const AuthForm = () => {
       >
         <TextField
           //required // le pone un asterisco para saber  que es obligatoria
-          id="name"
-          label="name"
+          id="firstName"
+          label="firstName"
           variant="standard"
-          error={errors.name ? true : false}
-          helperText={errors.name && errors.name.message}
+          error={errors.firstName ? true : false}
+          helperText={errors.firstName && errors.firstName.message}
           //variant="outlined"
           //defaultValue="Hello World"
-          {...register("name", {
+          {...register("firstName", {
             required: { value: true, message: "requerido" },
             maxLength: { value: 15, message: "nombre muy largo" },
+          })}
+        />
+
+        <TextField
+          //required // le pone un asterisco para saber  que es obligatoria
+          id="lastName"
+          label="lastName"
+          variant="standard"
+          error={errors.lastName ? true : false}
+          helperText={errors.lastName && errors.lastName.message}
+          //variant="outlined"
+          //defaultValue="Hello World"
+          {...register("lastName", {
+            required: { value: true, message: "requerido" },
+            maxLength: { value: 15, message: "nombre muy largo" },
+          })}
+        />
+
+        <TextField
+          //required // le pone un asterisco para saber  que es obligatoria
+          id="role"
+          label="role"
+          variant="standard"
+          error={errors.role ? true : false}
+          helperText={errors.role && errors.role.message}
+          //variant="outlined"
+          //defaultValue="Hello World"
+          {...register("role", {
+            required: { value: true, message: "requerido" },
           })}
         />
 
@@ -219,9 +237,6 @@ const AuthForm = () => {
         </Button>
       </Box>
 
-      <Box sx={{ m: 1 }} />
-
-      <Button onClick={googleRegister}> SignUp with Google</Button>
       <Box sx={{ m: 1 }} />
 
       <Typography variant="body1" sx={{ color: "red" }}>

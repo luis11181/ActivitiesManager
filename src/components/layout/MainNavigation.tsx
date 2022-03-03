@@ -17,10 +17,15 @@ import logo from "../../assets/psi.png";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 
-import { auth } from "../../firebase";
-import { signOut } from "firebase/auth";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
+import { useAppDispatch } from "../../app/hooks";
+import {
+  changeAuthState,
+  changeJWTFechaExpiracion,
+  changeJwtToken,
+  changeUserId,
+} from "../../app/mainStateSlice";
 
 const pages = [
   ["Resumen", "/"],
@@ -31,9 +36,20 @@ const pages = [
 
 const ResponsiveAppBar = () => {
   let navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   function logOut() {
-    signOut(auth);
+    dispatch(changeAuthState(false));
+    dispatch(changeJwtToken(null));
+    dispatch(changeJWTFechaExpiracion(null));
+    dispatch(changeUserId(null));
+
+    localStorage.removeItem("JWTToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("JWTFechaExpiracion");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("nombreUsuario");
+
     navigate("/");
     handleCloseNavMenu();
   }
