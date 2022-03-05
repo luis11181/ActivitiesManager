@@ -19,22 +19,20 @@ import Chip from "@mui/material/Chip";
 
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   changeAuthState,
   changeJWTFechaExpiracion,
   changeJwtToken,
   changeUserId,
 } from "../../app/mainStateSlice";
-
-const pages = [
-  ["Resumen", "/"],
-  ["Crear Peticion", "crear-comprobante"],
-  ["Consultar", "consulta"],
-  ["Counter", "counter"],
-];
+import { paginasPermitidas } from "../../permisos";
 
 const ResponsiveAppBar = () => {
+  const rol = useAppSelector((state) => state.main.rol);
+  const auth = useAppSelector((state) => state.main.autenticado);
+  const pages = paginasPermitidas(rol);
+
   let navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -59,10 +57,21 @@ const ResponsiveAppBar = () => {
     handleCloseNavMenu();
   }
 
-  const settings = [
-    { nombre: "SignIn", function: logIn },
-    { nombre: "Logout", function: logOut },
-  ];
+  let settings = [{ nombre: "SignIn", function: logIn }];
+
+  if (auth) {
+    settings = [{ nombre: "Logout", function: logOut }];
+  } else settings = [{ nombre: "SignIn", function: logIn }];
+
+  if (rol === "admin") {
+    settings = [
+      {
+        nombre: "Estructura Empresarial",
+        function: () => navigate("/admin/estructuraEmpresarial"),
+      },
+      ...settings,
+    ];
+  }
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -154,6 +163,7 @@ const ResponsiveAppBar = () => {
             >
               {pages.map((page) => (
                 <NavLink
+                  key={page[1]}
                   to={page[1]}
                   className={({ isActive }) => {
                     return !isActive ? classes.inactive : classes.active;
@@ -192,6 +202,7 @@ const ResponsiveAppBar = () => {
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <NavLink
+                key={page[1]}
                 to={page[1]}
                 className={({ isActive }) => {
                   return !isActive ? classes.inactive : classes.active;

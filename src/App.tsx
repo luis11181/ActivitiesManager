@@ -12,6 +12,8 @@ import AuthPage from "./pages/AuthPage";
 import MainPage from "./pages/MainPage";
 import NotFound from "./pages/NotFound";
 import useCheckAuth from "./hooks/useCheckAuth";
+import DefineRolesPage from "./pages/DefineRoles";
+import EstructuraEmpresarial from "./pages/EstructuraEmpresarial";
 
 function App() {
   //Hook para checar el estado de autenticacion y subscribirse a sus cambios
@@ -31,14 +33,24 @@ function App() {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/signIn" element={<AuthPage />} />
-        {/* <Route
-          path="/crear-comprobante"
+
+        <Route
+          path="/admin/definir-roles"
           element={
             <RequireAuth>
-              <NewInvoice />
+              <DefineRolesPage />
             </RequireAuth>
           }
-        /> */}
+        />
+
+        <Route
+          path="/admin/estructuraEmpresarial"
+          element={
+            <RequireAuth>
+              <EstructuraEmpresarial />
+            </RequireAuth>
+          }
+        />
 
         <Route
           path="/counter"

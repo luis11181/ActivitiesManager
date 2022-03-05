@@ -1,5 +1,3 @@
-import { auth } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { useCallback, useEffect, useLayoutEffect } from "react";
 import {
@@ -8,8 +6,6 @@ import {
   changeJwtToken,
   changeUserId,
 } from "../app/mainStateSlice";
-
-import { selectCorreo } from "../app/mainStateSlice";
 
 export default function useCheckAuth() {
   const dispatch = useAppDispatch();

@@ -1,7 +1,14 @@
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Button, FormControl, InputLabel, Typography } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  Typography,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -86,12 +93,14 @@ const AuthForm = () => {
 
       navigate("/");
     } catch (err: any) {
-      const errorMessage = err.message;
-      console.log(err);
-      setValues({
-        ...values,
-        error: errorMessage,
-      });
+      if (err.message) {
+        const errorMessage = err.message;
+        console.log(err);
+        setValues({
+          ...values,
+          error: errorMessage,
+        });
+      }
     }
   };
 
@@ -160,19 +169,32 @@ const AuthForm = () => {
           })}
         />
 
-        <TextField
-          //required // le pone un asterisco para saber  que es obligatoria
-          id="role"
-          label="role"
-          variant="standard"
-          error={errors.role ? true : false}
-          helperText={errors.role && errors.role.message}
-          //variant="outlined"
-          //defaultValue="Hello World"
-          {...register("role", {
-            required: { value: true, message: "requerido" },
-          })}
-        />
+        <FormControl fullWidth>
+          <InputLabel id="tipoComprobante-label">Rol</InputLabel>
+          <Select
+            autoWidth={true}
+            //sx={{ width: "max-content" }}
+            labelId="role"
+            id="role"
+            variant="standard"
+            error={errors.role && true}
+            defaultValue="user"
+            //value={age}
+            label="role"
+            {...register("role", {
+              required: { value: true, message: "requerido" },
+              // maxLength: { value: 15, message: "nombre muy largo" },
+            })}
+            //onChange={handleChange}
+          >
+            <MenuItem value={"admin"}>Administrador</MenuItem>
+            <MenuItem value={"user"}>Usuario</MenuItem>
+            <MenuItem value={"jefe"}>Jefe de area/sub-area</MenuItem>
+          </Select>
+          <FormHelperText error={errors.role && true}>
+            {errors.role && errors.role.message}
+          </FormHelperText>
+        </FormControl>
 
         <TextField
           // required // le pone un asterisco para saber  que es obligatoria

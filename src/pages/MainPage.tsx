@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import { Box, Button } from "@mui/material";
-import { auth } from "../firebase";
 import { selectNombre } from "../app/mainStateSlice";
 
 export default function MainPage() {
@@ -44,13 +43,6 @@ export default function MainPage() {
       }}
     >
       {`Bienvenido ${nombre}`}
-      <Button
-        onClick={() => {
-          navigate("/");
-        }}
-      >
-        Sign out
-      </Button>
     </Box>
   );
 }
