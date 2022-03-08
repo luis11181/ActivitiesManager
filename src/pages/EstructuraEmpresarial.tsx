@@ -1,6 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
-import { Box, Button, FormHelperText, MenuItem, Select } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormHelperText,
+  Grid,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import { selectJWTToken, selectNombre } from "../app/mainStateSlice";
 import Autocomplete from "@mui/material/Autocomplete";
 import { FormControl, InputLabel, Typography, TextField } from "@mui/material";
@@ -8,8 +15,10 @@ import IconButton from "@mui/material/IconButton";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useEffect, useLayoutEffect, useState } from "react";
 //useSWR library to manage the state
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { nextTick } from "process";
+import CachedIcon from "@mui/icons-material/Cached";
+import { flexbox } from "@mui/material/node_modules/@mui/system";
 
 interface AutocompleteOption {
   label: string;
@@ -54,6 +63,8 @@ async function fetcher<JSON = any>(
 export default function EstructuraEmpresarial() {
   let navigate = useNavigate();
 
+  const { mutate } = useSWRConfig();
+
   const token: string | null = useAppSelector(selectJWTToken);
 
   const { data: dataAreas, error: errorAreas } = useSWR<IResponse>(
@@ -66,16 +77,22 @@ export default function EstructuraEmpresarial() {
     }
   );
 
+  console.log(dataAreas);
+
   if (errorAreas) {
     console.error(errorAreas);
   }
 
-  let Areas = new Set<string>();
+  //area existentes
+
+  //let Areas = new Set<string>();
+
+  let areas: AutocompleteOption[] = [];
 
   if (dataAreas) {
     console.log(dataAreas);
-    dataAreas.areas.forEach((area) => {
-      Areas.add(area.area);
+    dataAreas.areas.forEach((element) => {
+      areas.push({ label: element.area, id: element.idAreas.toString() });
     });
   }
 
@@ -127,6 +144,86 @@ export default function EstructuraEmpresarial() {
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         sx={{
+          height: "100%",
+          width: "100%",
+        }}
+
+        //noValidate
+        //autoComplete="off"
+      >
+        <Typography variant="h6" gutterBottom>
+          Estructura Empresarial Agregar Areas:
+        </Typography>
+        <Grid
+          container //grid contenedor que define prorpiedades de la grilla
+          //spacing={1}
+          rowSpacing={1}
+          columnSpacing={{ xs: 1, sm: 2, md: 2 }}
+        >
+          <Grid item xs={12} md={4}>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                options={areas}
+                sx={{ width: "90%" }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Areas" />
+                )}
+                {...register("persona", {
+                  // maxLength: { value: 15, message: "nombre muy largo" },
+                })}
+              />
+              <IconButton
+                aria-label="delete"
+                type="button"
+                color="secondary"
+                size="large"
+                onClick={() => {
+                  mutate(`${process.env.REACT_APP_BACKENDURL}/info/areas`);
+
+                  console.log("aaa");
+                }}
+              >
+                <CachedIcon fontSize="inherit" />
+              </IconButton>{" "}
+            </Box>
+          </Grid>
+
+          <Grid
+            item
+            xs={6}
+            md={8}
+            sx={{
+              border: "1px solid",
+            }}
+          >
+            <TextField
+              id="numero"
+              //required // le pone un asterisco para saber  que es obligatoria
+              label="numero"
+              type="text"
+              variant="outlined"
+              error={errors.numero ? true : false}
+              helperText={errors.numero && errors.numero.message}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              //variant="outlined"
+              //defaultValue="Hello World"
+              {...register("numero", {
+                required: { value: true, message: "requerido" },
+                // maxLength: { value: 15, message: "nombre muy largo" },
+              })}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
           "& .MuiTextField-root": { m: 1, width: "25ch" },
           display: "flex",
           flexDirection: "column",
@@ -138,50 +235,33 @@ export default function EstructuraEmpresarial() {
         //autoComplete="off"
       >
         <FormControl fullWidth>
-          <InputLabel id="tipoComprobante-label">area</InputLabel>
+          <InputLabel id="tipoComprobante-label">Areas existentes</InputLabel>
           <Select
             autoWidth={true}
             //sx={{ width: "max-content" }}
-            labelId="area"
+            labelId="areas existentes"
             id="area"
             variant="standard"
             error={errors.area && true}
             defaultValue=""
             //value={age}
-            label="area"
+            label="areas existentes"
             {...register("area", {
               required: { value: true, message: "requerido" },
               // maxLength: { value: 15, message: "nombre muy largo" },
             })}
             //onChange={handleChange}
           >
-            {Areas.size > 0 &&
-              Array.from(Areas).map(
-                (
-                  area //map the set to an array
-                ) => (
-                  <MenuItem key={area} value={area}>
-                    {area}
-                  </MenuItem>
-                )
-              )}
+            {areas.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.label}
+              </MenuItem>
+            ))}
           </Select>
           <FormHelperText error={errors.role && true}>
             {errors.role && errors.role.message}
           </FormHelperText>
         </FormControl>
-
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={Empleados}
-          sx={{ width: 300 }}
-          renderInput={(params) => <TextField {...params} label="Areas" />}
-          {...register("persona", {
-            required: { value: true, message: "requerido" },
-            // maxLength: { value: 15, message: "nombre muy largo" },
-          })}
-        />
       </Box>
     </Box>
   );

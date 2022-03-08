@@ -105,7 +105,11 @@ const AuthForm: React.FC<IFromProps> = (props): JSX.Element => {
         // throw new Error("fallo el inicio de sesion!");
       }
 
-      const remainingMilliseconds = 60 * 60 * 1000;
+      const remainingMilliseconds = Number(
+        `${process.env.REACT_APP_JWTDURATIONTIME}`
+      );
+
+      console.log(remainingMilliseconds);
 
       const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
 
