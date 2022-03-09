@@ -1,4 +1,15 @@
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//!UTILES errores |*/
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //!UTILES centrar, alinear
 //clase para centrar tablas y otros objetos */
 .center {

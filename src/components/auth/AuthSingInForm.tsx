@@ -109,6 +109,20 @@ const AuthForm: React.FC<IFromProps> = (props): JSX.Element => {
         `${process.env.REACT_APP_JWTDURATIONTIME}`
       );
 
+      //TODO CAMBIAR EL GUARDADO DEL TOKEN EN COOKIES Y NO LOCAL STORAE, CON HTTP ONLY Y CON SECURE
+
+      //TODO para proteger de CSRF attacks se debe usar una clave secreta al generar el token(random string), guardarla en un XSRF-TOKEN EN EL CLIENTe y en secreto comoparte del jwt token. este XSRF debe ser readable, y se envia junto con el token en el request.(ya que solo desde el mismo dominio se puede leer dicho token)
+
+      //* otra forma de proteccion seria solo agregar el random string de clave XSRF-TOKEN  en el cookie y enviarlo en la creacion del token, y en cada request se debe agregar el XSRF-TOKEN en el header. validando este el servidor contra el del jwt token.(ya que solo desde el mismo dominio se puede leer dicho token)
+
+      //* set jwt token in cookies of name access_token
+      // setCookie("access_token", resultFetchJson.token, {
+      //   maxAge: remainingMilliseconds,
+      //   path: "/",
+      //   httpOnly: true, //not accesible throw javascript
+      //   secure: true, //solo se envia por https
+      // });
+
       console.log(remainingMilliseconds);
 
       const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
