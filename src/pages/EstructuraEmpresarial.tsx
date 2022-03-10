@@ -33,6 +33,12 @@ interface IFormNewAreaInput {
   areasDisponibles: AutocompleteOption[];
 }
 
+interface IFormEmployeeAreaInput {
+  correoUser: string;
+  areaUser: string;
+  etiquetas: string;
+}
+
 interface IResponse {
   areas: { idAreas: number; area: string }[];
   message: string;
@@ -112,6 +118,12 @@ export default function EstructuraEmpresarial() {
     formState: { errors },
   } = useForm();
 
+  const {
+    register: registerEmployee,
+    handleSubmit: handleSubmitEmployee,
+    formState: { errors: errorsEmployee },
+  } = useForm();
+
   const watchArea = watch(["area"]);
 
   // useEffect(() => {
@@ -153,6 +165,70 @@ export default function EstructuraEmpresarial() {
             area: data.areaNueva,
             areaPadre: areaPadre,
             codigoArea: data.codigoAreaNueva,
+          }),
+        }
+      );
+
+      let resultFetchJson = (await resultFetch.json()) as IResponse;
+
+      if (resultFetch.status === 401) {
+        throw new Error(resultFetchJson.message);
+      }
+
+      if (!resultFetch.ok) {
+        throw new Error(resultFetchJson.message);
+        // throw new Error("fallo el inicio de sesion!");
+      }
+
+      setFeedback((anterior) => ({
+        ...anterior,
+        message: null,
+        error: false,
+      }));
+    } catch (err: any) {
+      let errorMessage = "error";
+      console.log(err);
+      if (err?.message && typeof err?.message === "string") {
+        errorMessage = err.message;
+      }
+      setFeedback((anterior) => ({
+        ...anterior,
+        message: errorMessage,
+        error: true,
+      }));
+    }
+  };
+
+  const onSubmitEmployeeArea: SubmitHandler<IFormEmployeeAreaInput> = async (
+    data
+  ) => {
+    //alert(JSON.stringify(data));
+
+    interface IResponse {
+      message: string;
+    }
+
+    try {
+      console.log(data);
+
+      let codigoArea = areas.find(
+        (element) => element.label === data.areaUser
+      )?.id;
+
+      console.log(codigoArea);
+
+      let resultFetch = await fetch(
+        `${process.env.REACT_APP_BACKENDURL}/admin/employeeArea`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({
+            correoUser: data.correoUser,
+            areaId: codigoArea,
+            etiquetas: data.etiquetas,
           }),
         }
       );
@@ -328,6 +404,8 @@ export default function EstructuraEmpresarial() {
               <Button
                 startIcon={<SendIcon />}
                 type="submit"
+                color="secondary"
+                size="small"
                 variant="contained"
                 onClick={() => {}}
               >
@@ -382,6 +460,8 @@ export default function EstructuraEmpresarial() {
         </FormControl>
       </Box> */}
 
+      <Box sx={{ height: "3rem" }} />
+
       <Box
         sx={{
           height: "100%",
@@ -392,12 +472,12 @@ export default function EstructuraEmpresarial() {
         //autoComplete="off"
       >
         <Typography variant="h6" gutterBottom>
-          Estructura Empresarial definir roles y areas de los empleados:
+          Estructura Empresarial definir etiquetas y area de los empleados:
         </Typography>
 
         <Box
           component="form"
-          onSubmit={handleSubmit(onSubmitNewArea)}
+          onSubmit={handleSubmitEmployee(onSubmitEmployeeArea)}
           sx={{
             display: "flex",
             height: "100%",
@@ -413,46 +493,11 @@ export default function EstructuraEmpresarial() {
             rowSpacing={1}
             columnSpacing={{ xs: 1, sm: 2, md: 2 }}
           >
-            <Grid item xs={12} md={4}>
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Autocomplete
-                  disablePortal
-                  id="combo-box-demo"
-                  options={areas}
-                  isOptionEqualToValue={(option, value) =>
-                    option.label === value.label
-                  }
-                  sx={{ width: "90%" }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Areas Existentes" />
-                  )}
-                  {...register("areasDisponibles", {
-                    // maxLength: { value: 15, message: "nombre muy largo" },
-                  })}
-                />
-                <IconButton
-                  aria-label="refresh"
-                  type="button"
-                  color="secondary"
-                  size="large"
-                  onClick={() => {
-                    mutate([
-                      `${process.env.REACT_APP_BACKENDURL}/info/areas`,
-                      token,
-                    ]);
-                  }}
-                >
-                  <CachedIcon fontSize="inherit" />
-                </IconButton>
-              </Box>
-            </Grid>
-
             <Grid
               item
               xs={12}
               md={8}
               sx={{
-                borderLeft: "1px solid blue",
                 display: "flex",
                 justifyContent: "space-evenly",
                 width: "100%",
@@ -460,64 +505,100 @@ export default function EstructuraEmpresarial() {
               }}
             >
               <TextField
-                id="areaNueva"
+                id="correoUser"
                 //required // le pone un asterisco para saber  que es obligatoria
-                label="Nombre Nueva Area"
-                type="text"
+                label="email empleado"
+                type="email"
                 variant="outlined"
                 sx={{ minWidth: "15rem", maxWidth: "25rem" }}
-                error={errors.areaNueva ? true : false}
-                helperText={errors.areaNueva && errors.areaNueva.message}
-                //variant="outlined"
-                //defaultValue="Hello World"
-                {...register("areaNueva", {
-                  required: { value: true, message: "requerido" },
-                  // maxLength: { value: 15, message: "nombre muy largo" },
-                })}
-              />
-              <TextField
-                id="codigoAreaNueva"
-                //required // le pone un asterisco para saber  que es obligatoria
-                label="Codigo Nueva Area"
-                type="text"
-                variant="outlined"
-                sx={{ minWidth: "15rem", maxWidth: "25rem" }}
-                error={errors.codigoAreaNueva ? true : false}
+                error={errorsEmployee.correoUser ? true : false}
                 helperText={
-                  errors.codigoAreaNueva && errors.codigoAreaNueva.message
+                  errorsEmployee.correoUser && errorsEmployee.correoUser.message
                 }
                 //variant="outlined"
                 //defaultValue="Hello World"
-                {...register("codigoAreaNueva", {
+                {...registerEmployee("correoUser", {
                   required: { value: true, message: "requerido" },
+                  pattern: {
+                    value:
+                      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                    message: "correo no valido",
+                  },
                   // maxLength: { value: 15, message: "nombre muy largo" },
                 })}
               />
 
               <Autocomplete
                 disablePortal
-                id="areapadre"
+                id="areaUser"
                 sx={{ minWidth: "15rem", maxWidth: "25rem" }}
-                options={areas2}
+                options={areas}
                 isOptionEqualToValue={(option, value) =>
                   option.label === value.label
                 }
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Area Padre"
-                    {...register("padreAreaNueva")}
+                    label="Area del empleado"
+                    {...registerEmployee("areaUser")}
                   />
                 )}
               />
+            </Grid>
 
+            <Grid
+              item
+              xs={12}
+              md={4}
+              sx={{
+                display: "flex",
+                justifyContent: "space-evenly",
+                width: "100%",
+                flexFlow: "wrap",
+              }}
+            >
+              <TextField
+                id="etiquetas"
+                //required // le pone un asterisco para saber  que es obligatoria
+                label="etiquetas (descriptores empleado)"
+                type="text"
+                variant="outlined"
+                defaultValue={"etiqueta1 , etiqueta2"}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                sx={{ minWidth: "20rem", maxWidth: "30rem" }}
+                error={errorsEmployee.etiquetas ? true : false}
+                helperText={
+                  errorsEmployee.etiquetas && errorsEmployee.etiquetas.message
+                }
+                //variant="outlined"
+                //defaultValue="Hello World"
+                {...registerEmployee("etiquetas", {
+                  // maxLength: { value: 15, message: "nombre muy largo" },
+                })}
+              />
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              md={12}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
               <Button
                 startIcon={<SendIcon />}
+                size="small"
                 type="submit"
+                color="secondary"
                 variant="contained"
                 onClick={() => {}}
               >
-                Agregar Area
+                Asignar/modificar Area Empleado
               </Button>
             </Grid>
           </Grid>
