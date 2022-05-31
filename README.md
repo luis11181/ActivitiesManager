@@ -1,6 +1,6 @@
-# aplicacion para la gestion de actividades
+# idea for task manager version 1 mockup
 
-This aplication is meant to facilitate the employees task management and control.
+This aplication is meant to facilitate the employees task management and control; is usind node.js, prismaORM and react.
 
 ## Demo
 
