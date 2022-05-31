@@ -30,6 +30,7 @@ interface IFormNewAreaInput {
   areaNueva: string;
   codigoAreaNueva: number;
   padreAreaNueva: string;
+  jefeAreaNueva: string;
   areasDisponibles: AutocompleteOption[];
 }
 
@@ -165,6 +166,7 @@ export default function EstructuraEmpresarial() {
             area: data.areaNueva,
             areaPadre: areaPadre,
             codigoArea: data.codigoAreaNueva,
+            jefeArea: data.jefeAreaNueva,
           }),
         }
       );
@@ -349,68 +351,161 @@ export default function EstructuraEmpresarial() {
                 flexFlow: "wrap",
               }}
             >
-              <TextField
-                id="areaNueva"
-                //required // le pone un asterisco para saber  que es obligatoria
-                label="Nombre Nueva Area"
-                type="text"
-                variant="outlined"
-                sx={{ minWidth: "15rem", maxWidth: "25rem" }}
-                error={errors.areaNueva ? true : false}
-                helperText={errors.areaNueva && errors.areaNueva.message}
-                //variant="outlined"
-                //defaultValue="Hello World"
-                {...register("areaNueva", {
-                  required: { value: true, message: "requerido" },
-                  // maxLength: { value: 15, message: "nombre muy largo" },
-                })}
-              />
-              <TextField
-                id="codigoAreaNueva"
-                //required // le pone un asterisco para saber  que es obligatoria
-                label="Codigo Nueva Area"
-                type="text"
-                variant="outlined"
-                sx={{ minWidth: "15rem", maxWidth: "25rem" }}
-                error={errors.codigoAreaNueva ? true : false}
-                helperText={
-                  errors.codigoAreaNueva && errors.codigoAreaNueva.message
-                }
-                //variant="outlined"
-                //defaultValue="Hello World"
-                {...register("codigoAreaNueva", {
-                  required: { value: true, message: "requerido" },
-                  // maxLength: { value: 15, message: "nombre muy largo" },
-                })}
-              />
-
-              <Autocomplete
-                disablePortal
-                id="areapadre"
-                sx={{ minWidth: "15rem", maxWidth: "25rem" }}
-                options={areas2}
-                isOptionEqualToValue={(option, value) =>
-                  option.label === value.label
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Area Padre"
-                    {...register("padreAreaNueva")}
-                  />
-                )}
-              />
-
-              <Button
-                startIcon={<SendIcon />}
-                type="submit"
-                color="secondary"
-                size="small"
-                variant="contained"
-                onClick={() => {}}
+              <Grid
+                container //grid contenedor que define propiedades de la grilla
+                //spacing={1}
+                rowSpacing={1}
+                columnSpacing={{ xs: 1, sm: 2, md: 2 }}
               >
-                Agregar Area
-              </Button>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    width: "100%",
+                    flexFlow: "wrap",
+                  }}
+                >
+                  <TextField
+                    id="areaNueva"
+                    //required // le pone un asterisco para saber  que es obligatoria
+                    label="Nombre Nueva Area"
+                    type="text"
+                    variant="outlined"
+                    sx={{ minWidth: "15rem", maxWidth: "25rem" }}
+                    error={errors.areaNueva ? true : false}
+                    helperText={errors.areaNueva && errors.areaNueva.message}
+                    //variant="outlined"
+                    //defaultValue="Hello World"
+                    {...register("areaNueva", {
+                      required: { value: true, message: "requerido" },
+                      // maxLength: { value: 15, message: "nombre muy largo" },
+                    })}
+                  />{" "}
+                </Grid>
+
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    width: "100%",
+                    flexFlow: "wrap",
+                  }}
+                >
+                  <TextField
+                    id="codigoAreaNueva"
+                    //required // le pone un asterisco para saber  que es obligatoria
+                    label="Codigo Nueva Area"
+                    type="text"
+                    variant="outlined"
+                    sx={{ minWidth: "15rem", maxWidth: "25rem" }}
+                    error={errors.codigoAreaNueva ? true : false}
+                    helperText={
+                      errors.codigoAreaNueva && errors.codigoAreaNueva.message
+                    }
+                    //variant="outlined"
+                    //defaultValue="Hello World"
+                    {...register("codigoAreaNueva", {
+                      required: { value: true, message: "requerido" },
+                      // maxLength: { value: 15, message: "nombre muy largo" },
+                    })}
+                  />
+                </Grid>
+
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    width: "100%",
+                    flexFlow: "wrap",
+                  }}
+                >
+                  <Autocomplete
+                    disablePortal
+                    id="areapadre"
+                    sx={{ minWidth: "15rem", maxWidth: "25rem" }}
+                    options={areas2}
+                    isOptionEqualToValue={(option, value) =>
+                      option.label === value.label
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Area Padre"
+                        {...register("padreAreaNueva", {
+                          required: { value: true, message: "requerido" },
+                        })}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    width: "100%",
+                    flexFlow: "wrap",
+                  }}
+                >
+                  <TextField
+                    id="jefeAreaNueva"
+                    //required // le pone un asterisco para saber  que es obligatoria
+                    label="correo del jefe responsable del Area"
+                    type="text"
+                    variant="outlined"
+                    sx={{ minWidth: "15rem", maxWidth: "25rem" }}
+                    error={errors.jefeAreaNueva ? true : false}
+                    helperText={
+                      errors.jefeAreaNueva && errors.jefeAreaNueva.message
+                    }
+                    //variant="outlined"
+                    //defaultValue="Hello World"
+                    {...register("jefeAreaNueva", {
+                      required: { value: true, message: "requerido" },
+                      pattern: {
+                        value:
+                          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                        message: "correo no valido",
+                      },
+                      // maxLength: { value: 15, message: "nombre muy largo" },
+                    })}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={12}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    width: "100%",
+                    flexFlow: "wrap",
+                  }}
+                >
+                  <Button
+                    startIcon={<SendIcon />}
+                    type="submit"
+                    color="secondary"
+                    size="small"
+                    variant="contained"
+                    onClick={() => {}}
+                  >
+                    Agregar/Modificar Area
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Box>

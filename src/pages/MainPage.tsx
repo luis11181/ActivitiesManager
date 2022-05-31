@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import { Box, Button } from "@mui/material";
 import { selectNombre } from "../app/mainStateSlice";
+import resumen from "../assets/resumen.jpg";
 
 export default function MainPage() {
   const authed: boolean | null = useAppSelector(
@@ -43,6 +44,8 @@ export default function MainPage() {
       }}
     >
       {`Bienvenido ${nombre}`}
+
+      <img src={resumen} alt="resumen" width="60%" />
     </Box>
   );
 }

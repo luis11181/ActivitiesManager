@@ -24,6 +24,8 @@ import {
   changeAuthState,
   changeJWTFechaExpiracion,
   changeJwtToken,
+  changeNombreUsuario,
+  changeRol,
   changeUserId,
 } from "../../app/mainStateSlice";
 import { paginasPermitidas } from "../../permisos";
@@ -41,6 +43,8 @@ const ResponsiveAppBar = () => {
     dispatch(changeJwtToken(null));
     dispatch(changeJWTFechaExpiracion(null));
     dispatch(changeUserId(null));
+    dispatch(changeNombreUsuario(null));
+    dispatch(changeRol(null));
 
     localStorage.removeItem("JWTToken");
     localStorage.removeItem("userId");

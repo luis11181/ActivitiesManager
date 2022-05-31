@@ -111,7 +111,7 @@ const AuthForm: React.FC<IFromProps> = (props): JSX.Element => {
 
       //TODO CAMBIAR EL GUARDADO DEL TOKEN EN COOKIES Y NO LOCAL STORAE, CON HTTP ONLY Y CON SECURE
 
-      //TODO para proteger de CSRF attacks se debe usar una clave secreta al generar el token(random string), guardarla en un XSRF-TOKEN EN EL CLIENTe y en secreto comoparte del jwt token. este XSRF debe ser readable, y se envia junto con el token en el request.(ya que solo desde el mismo dominio se puede leer dicho token)
+      //TODO para proteger de CSRF attacks se debe usar una clave secreta al generar el token(random string), guardarla en un CSRF-TOKEN EN EL CLIENTe y en secreto como parte del jwt token. este XSRF debe ser readable, en localstorage, y se envia junto con el token en el request.(ya que solo desde el mismo dominio se puede leer dicho token)
 
       //* otra forma de proteccion seria solo agregar el random string de clave XSRF-TOKEN  en el cookie y enviarlo en la creacion del token, y en cada request se debe agregar el XSRF-TOKEN en el header. validando este el servidor contra el del jwt token.(ya que solo desde el mismo dominio se puede leer dicho token)
 

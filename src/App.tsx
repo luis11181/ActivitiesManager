@@ -12,7 +12,7 @@ import AuthPage from "./pages/AuthPage";
 import MainPage from "./pages/MainPage";
 import NotFound from "./pages/NotFound";
 import useCheckAuth from "./hooks/useCheckAuth";
-import DefineRolesPage from "./pages/DefineRoles";
+import CrearFlujos from "./pages/CrearFlujos";
 import EstructuraEmpresarial from "./pages/EstructuraEmpresarial";
 
 function App() {
@@ -35,10 +35,10 @@ function App() {
         <Route path="/signIn" element={<AuthPage />} />
 
         <Route
-          path="/admin/definir-roles"
+          path="/admin/crear-flujos"
           element={
             <RequireAuth>
-              <DefineRolesPage />
+              <CrearFlujos />
             </RequireAuth>
           }
         />

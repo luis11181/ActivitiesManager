@@ -13,8 +13,6 @@ export const paginasPermitidas = (rol: string | null) => {
       ["Crear Peticion", "crear-peticion"],
       ["subordinados", "lider/subordinados"],
       ["Crear Flujos", "admin/crear-flujos"],
-      ["Definir Roles", "admin/definir-roles"],
-      ["Counter", "counter"],
     ];
   }
 
