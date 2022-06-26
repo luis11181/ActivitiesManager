@@ -28,6 +28,7 @@ interface IFormInput {
   password: string;
 }
 
+class dsfadf
 interface IValues {
   showPassword: boolean;
   error: null | string;
